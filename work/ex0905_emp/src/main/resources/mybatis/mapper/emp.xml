@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sist.ex0905_emp.mybatis.mapper.EmpMapper"> <!--EmpMapper와 연동!(생성한 인터페이스와 연동)-->
+    <select id="all" resultType="com.sist.ex0905_emp.mybatis.vo.EmpVO">
+        select * from emp
+    </select>
+
+    <!--
+     동적쿼리
+        searchType이 0일때 사번검색
+        searchType이 1일때 이름검색
+        searchType이 2일때 직종검색
+        searchType이 3일때 부서검색
+    -->
+    <select id="search" parameterType="Map" resultType="com.sist.ex0905_emp.mybatis.vo.EmpVO">
+        select * from emp
+        <trim prefix="WHERE">
+            <if test="searchType != null and searchType == 0">
+                empno = #{searchValue}
+            </if>
+            <if test="searchType != null and searchType == 1">
+                ename LIKE CONCAT('%', #{searchValue}, '%')
+            </if>
+            <if test="searchType != null and searchType == 2">
+                job LIKE CONCAT('%', #{searchValue}, '%')
+            </if>
+            <if test="searchType != null and searchType == 3">
+                deptno LIKE CONCAT('%', #{searchValue}, '%')
+            </if>
+        </trim>
+    </select>
+
+    <insert id="add" parameterType="com.sist.ex0905_emp.mybatis.vo.EmpVO">
+        INSERT INTO emp(empno, ename, job, hiredate)
+        VALUES(#{empno}, #{ename}, #{job}, #{hiredate})
+    </insert>
+</mapper>
