@@ -1,5 +1,7 @@
 package com.sist.ex0909_jpa1.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -35,6 +37,27 @@ public class ProductController {
                 .build();
         productRepository.save(product); //Repository를 상속받아서 
         return "test2";
+    }
+    
+    @GetMapping("/t3")
+    public String test3() {
+        
+        List<ProductJPO> list = productRepository.findAll();
+
+        StringBuffer sb = new StringBuffer();
+        for(ProductJPO product : list) {
+            sb.append(product.getPNum());
+            sb.append(" / ");
+            sb.append(product.getPName());
+            sb.append(" / ");
+            sb.append(product.getPCompany());
+            sb.append(" / ");
+            sb.append(product.getCvo1().getCName());
+            sb.append(" / ");
+            sb.append(product.getCvo1().getDesc());
+            sb.append("<br/>");
+        }
+        return sb.toString();
     }
     
 }
