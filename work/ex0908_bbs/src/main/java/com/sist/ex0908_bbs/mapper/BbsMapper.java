@@ -18,4 +18,6 @@ public interface BbsMapper {
     BbsVO getBbs(String b_idx);
 
     int hit(String b_idx); //조회수 증가
+
+    int edit(BbsVO vo); //원글 수정
 }

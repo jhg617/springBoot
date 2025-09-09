@@ -63,14 +63,14 @@
 
 
     <!-- 원글 수정 -->
-    <update id="edit" parameterType="Map">
+    <update id="edit" parameterType="com.sist.ex0908_bbs.vo.BbsVO">
         UPDATE bbs_t
         <trim prefix="SET" suffixOverrides=",">
-            subject = #{title},
+            subject = #{subject},
             content = #{content},
-            <if test="fname != null">
-                file_name = #{fname},
-                ori_name = #{oname}
+            <if test="file_name != null">
+                file_name = #{file_name},
+                ori_name = #{ori_name}
             </if>
         </trim>
         WHERE b_idx = #{b_idx}

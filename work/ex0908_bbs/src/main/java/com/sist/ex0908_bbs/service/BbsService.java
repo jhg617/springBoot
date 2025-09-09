@@ -46,4 +46,8 @@ public class BbsService {
         return bbsMapper.hit(b_idx);
     }
     
+    //원글 수정
+    public int edit(BbsVO vo) {
+        return bbsMapper.edit(vo);
+    }
 }

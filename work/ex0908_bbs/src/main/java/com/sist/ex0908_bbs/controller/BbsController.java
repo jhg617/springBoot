@@ -1,6 +1,10 @@
 package com.sist.ex0908_bbs.controller;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.nio.Buffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -10,6 +14,7 @@ import org.apache.catalina.connector.Request;
 import org.eclipse.tags.shaded.org.apache.xpath.operations.Mod;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
@@ -21,8 +26,10 @@ import com.sist.ex0908_bbs.util.Paging;
 import com.sist.ex0908_bbs.vo.BbsVO;
 
 import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,6 +49,9 @@ public class BbsController {
     
     @Autowired
     private HttpServletRequest request;
+
+    @Autowired
+    private HttpServletResponse response;
 
     @Autowired
     private BbsService bbsService;
@@ -139,74 +149,74 @@ public class BbsController {
         return entity;
     }
     
-    @RequestMapping(value = "write", method=RequestMethod.POST)
-    public ModelAndView write(BbsVO vo) {
-        ModelAndView mv = new ModelAndView();
-        
-        String c_type = request.getContentType();
-        if(c_type.startsWith("multipart")){
-            //파일이 첨부되는 폼에서 호출된 경우
-            MultipartFile f = vo.getFile(); //파일이름 뽑기
-            String fname = null;
-            if(f != null && f.getSize() > 0) {
-                //첨부된 파일이 있을 경우 - 파일이 저장될 위치를 절대경로화 시킨다.
-                String realPath = application.getRealPath(bbs_upload);
-                fname = f.getOriginalFilename();
-                // 동일한 파일명이 있을 때만 파일명을 변경하자!
-                fname = FileRenameUtil.checkSameFileName(fname, realPath);
-
-                try {
-                    // 파일 업로드(upload폴더에 저장)
-                    f.transferTo(new File(realPath, fname));
-                    vo.setFile_name(fname);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            } //if의 끝
-            vo.setIp(request.getRemoteAddr()); //IP저장
-            bbsService.add(vo); //vo를 DAO로 전달하여 DB에 저장하도록 한다.
-            
-        }
-        // list화면으로 이동하기 위해 다시 list라는 RequestMapping을
-            // redirect로 호출한다
-            mv.setViewName("redirect:/list?bname="+vo.getBname());
-            return mv;
-    }
-
-    // @PostMapping("/write")
-    // public ModelAndView write2(BbsVO vo) {
+    // @RequestMapping(value = "write", method=RequestMethod.POST)
+    // public ModelAndView write(BbsVO vo) {
     //     ModelAndView mv = new ModelAndView();
         
-    //     // 전달되어오는 파라미터들을 모두 vo에 들어있다.
-    //     // 중요한것은 첨부파일이 있었는지? 없었는지?....
-    //     MultipartFile file = vo.getFile();
-    //     if(file.getSize() > 0) {
-    //         // 파일이 첨부된 상태일때만 업로드한다.
+    //     String c_type = request.getContentType();
+    //     if(c_type.startsWith("multipart")){
+    //         //파일이 첨부되는 폼에서 호출된 경우
+    //         MultipartFile f = vo.getFile(); //파일이름 뽑기
+    //         String fname = null;
+    //         if(f != null && f.getSize() > 0) {
+    //             //첨부된 파일이 있을 경우 - 파일이 저장될 위치를 절대경로화 시킨다.
+    //             String realPath = application.getRealPath(bbs_upload);
+    //             fname = f.getOriginalFilename();
+    //             // 동일한 파일명이 있을 때만 파일명을 변경하자!
+    //             fname = FileRenameUtil.checkSameFileName(fname, realPath);
 
-    //         //업로드할 위치(절대경로)
-    //         String realPath = application.getRealPath(bbs_upload);
-
-    //         //원본 파일명
-    //         String oname = file.getOriginalFilename();
-
-    //         //같은 파일명이 있다면 파일명 변경
-    //         String fname = FileRenameUtil.checkSameFileName(oname, realPath);
-
-    //         try {
-    //             file.transferTo(new File(realPath, fname)); //서버에 업로드(저장)
-    //             vo.setFile_name(fname);
-    //             vo.setOri_name(oname);
-    //         } catch (Exception e) {
-    //             e.printStackTrace();
-    //         }
+    //             try {
+    //                 // 파일 업로드(upload폴더에 저장)
+    //                 f.transferTo(new File(realPath, fname));
+    //                 vo.setFile_name(fname);
+    //             } catch (Exception e) {
+    //                 e.printStackTrace();
+    //             }
+    //         } //if의 끝
+    //         vo.setIp(request.getRemoteAddr()); //IP저장
+    //         bbsService.add(vo); //vo를 DAO로 전달하여 DB에 저장하도록 한다.
+            
     //     }
-    //     vo.setIp(request.getRemoteAddr()); //vo에 작성자 IP 담기
-    //     int result = bbsService.add(vo); //DB에 저장
-
-    //     // 목록으로 돌아간다.
-    //     mv.setViewName("redirect:/list?bname="+vo.getBname());
-    //     return mv;
+    //     // list화면으로 이동하기 위해 다시 list라는 RequestMapping을
+    //         // redirect로 호출한다
+    //         mv.setViewName("redirect:/list?bname="+vo.getBname());
+    //         return mv;
     // }
+
+    @PostMapping("/write")
+    public ModelAndView write2(BbsVO vo) {
+        ModelAndView mv = new ModelAndView();
+        
+        // 전달되어오는 파라미터들을 모두 vo에 들어있다.
+        // 중요한것은 첨부파일이 있었는지? 없었는지?....
+        MultipartFile file = vo.getFile();
+        if(file.getSize() > 0) {
+            // 파일이 첨부된 상태일때만 업로드한다.
+
+            //업로드할 위치(절대경로)
+            String realPath = application.getRealPath(bbs_upload);
+
+            //원본 파일명
+            String oname = file.getOriginalFilename();
+
+            //같은 파일명이 있다면 파일명 변경
+            String fname = FileRenameUtil.checkSameFileName(oname, realPath);
+
+            try {
+                file.transferTo(new File(realPath, fname)); //서버에 업로드(저장)
+                vo.setFile_name(fname);
+                vo.setOri_name(oname);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        vo.setIp(request.getRemoteAddr()); //vo에 작성자 IP 담기
+        int result = bbsService.add(vo); //DB에 저장
+
+        // 목록으로 돌아간다.
+        mv.setViewName("redirect:/list?bname="+vo.getBname());
+        return mv;
+    }
 
     //게시글 보기기능
     // 조회수 증가처리, 읽은 게시물은 조회수 증가를 하지 않는다.
@@ -262,6 +272,96 @@ public class BbsController {
         mv.addObject("vo", vo);
         mv.setViewName(bname+"/view");
         return mv;
+    }
+    
+    @PostMapping("/edit")
+    public ModelAndView edit(BbsVO vo, String cPage) {
+        ModelAndView mv = new ModelAndView();
+        
+        String c_type = request.getContentType();
+        if (c_type != null && c_type.startsWith("multipart/")) {
+            // 파일이 첨부되는 폼에서 호출된 경우
+            MultipartFile f = vo.getFile(); //파일이름 뽑기
+            if (f.getSize() > 0) {
+                String realPath = application.getRealPath(bbs_upload);
+                String oname = f.getOriginalFilename();
+                String fname = FileRenameUtil.checkSameFileName(oname, realPath);
+                try {
+                    f.transferTo(new File(realPath, fname));
+                    vo.setFile_name(fname);
+                    vo.setOri_name(oname);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+                vo.setIp(request.getRemoteAddr()); //IP저장
+                bbsService.edit(vo); //db에서 수정처리
+                
+                mv.setViewName("redirect:view?bname="+vo.getBname()
+                        +"&b_idx="+vo.getB_idx()+"&cPage="+cPage);
+                
+            } else {
+                //인자로 받은 b_idx를 가지고 게시물을 얻어온다.
+                BbsVO bvo = bbsService.getBbs(vo.getB_idx());
+            
+                mv.addObject("bname", vo.getBname());
+                mv.addObject("cPage", cPage);
+                mv.addObject("vo", bvo);
+                mv.setViewName(vo.getBname()+"/edit");
+            }
+            return mv;
+        }
+
+
+    @PostMapping("download")
+    public ResponseEntity<String> download(String f_name) {
+        String realPath = application.getRealPath(bbs_upload+f_name);
+        File f = new File(realPath);
+
+        if (f.exists()) {
+            //파일이 존재한다면
+            //파일다운로드 처리를 해주자
+            byte[] buf = new byte[4096];
+            int size = -1;
+
+            //파일을 다운로드에 필요한 스트림들 준비
+            BufferedInputStream bis = null;
+            FileInputStream fis = null;
+
+            BufferedOutputStream bos = null;
+            ServletOutputStream sos = null;
+            try {
+                response.setContentType("application/x-msdownload");
+                response.setHeader("Content-Disposition", 
+                "attachment; filename=" + 
+                new String(f_name.getBytes(), "8859_1"));
+
+                fis = new FileInputStream(f);
+                bis = new BufferedInputStream(fis);
+
+                sos = response.getOutputStream();
+                bos = new BufferedOutputStream(sos);
+
+                while((size = bis.read(buf)) != -1) {
+                    bos.write(buf, 0, size);
+                    bos.flush();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    if (bos != null) bos.close();
+                    if (sos != null) sos.close();
+                    if (bis != null) bis.close();
+                    if (fis != null) fis.close();
+                } catch (Exception e2) {
+                    e2.printStackTrace();
+                }
+            }
+
+        }
+        
+        return null;
     }
     
     
