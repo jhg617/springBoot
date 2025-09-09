@@ -35,5 +35,15 @@ public class BbsService {
     public int add(BbsVO vo) {
         return bbsMapper.add(vo);
     }
+
+    //게시물 상세보기
+    public BbsVO getBbs(String b_idx) {
+        return bbsMapper.getBbs(b_idx);
+    }
+
+    //조회수 증가
+    public int hit(String b_idx) { //매퍼와 동일하게 인자를 맞추면됨
+        return bbsMapper.hit(b_idx);
+    }
     
 }

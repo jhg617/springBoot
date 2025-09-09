@@ -96,7 +96,9 @@
                     ${page.totalCount-((page.nowPage-1)*page.numPerPage)-vs.index}
                 </td>
                 <td style="text-align: left;">
+                    <a href="view?bname=${bname}&cPage=${page.nowPage}&b_idx=${vo.b_idx}">
                     ${vo.subject}
+                    </a>
                 </td>
                 <td>${vo.writer}</td>
                 <td>${vo.write_date}</td>

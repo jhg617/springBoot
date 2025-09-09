@@ -1,5 +1,5 @@
-<%@ page import="mybatis.vo.BbsVO" %>
-<%@ page import="mybatis.vo.CommVO" %>
+<%@ page import="com.sist.ex0908_bbs.vo.BbsVO" %>
+<%@ page import="com.sist.ex0908_bbs.vo.CommVO" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>

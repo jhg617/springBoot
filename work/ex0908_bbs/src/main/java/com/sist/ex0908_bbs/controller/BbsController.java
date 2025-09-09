@@ -1,6 +1,7 @@
 package com.sist.ex0908_bbs.controller;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,7 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
-
+import com.sist.ex0908_bbs.config.DbConfig;
 import com.sist.ex0908_bbs.service.BbsService;
 import com.sist.ex0908_bbs.service.CommService;
 import com.sist.ex0908_bbs.util.FileRenameUtil;
@@ -22,6 +23,7 @@ import com.sist.ex0908_bbs.vo.BbsVO;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -34,6 +36,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @RestController
 public class BbsController {
 
+    private final DbConfig dbConfig;
+
     private final CommService commService;
     
     @Autowired
@@ -44,6 +48,9 @@ public class BbsController {
 
     @Autowired
     private ServletContext application;
+
+    @Autowired
+    private HttpSession session;
     
     @Value("${server.editor.path}") //application.properties에 설정한 값
     private String editor_img;
@@ -54,11 +61,12 @@ public class BbsController {
     private int numPerPage = 7; // 한 페이지당 보여질 게시물 수
     private int pagePerBlock = 5;
 
-    BbsController(CommService commService) {
+    BbsController(CommService commService, DbConfig dbConfig) {
         this.commService = commService;
+        this.dbConfig = dbConfig;
     } // 한 블럭당 표현할 페이지 수
 
-    @GetMapping("/list")
+    @RequestMapping("/list")
     public ModelAndView getBbsList(@RequestParam String bname, String cPage) {
         ModelAndView mv = new ModelAndView();
         mv.setViewName(bname+"/list");
@@ -164,5 +172,97 @@ public class BbsController {
             mv.setViewName("redirect:/list?bname="+vo.getBname());
             return mv;
     }
+
+    // @PostMapping("/write")
+    // public ModelAndView write2(BbsVO vo) {
+    //     ModelAndView mv = new ModelAndView();
+        
+    //     // 전달되어오는 파라미터들을 모두 vo에 들어있다.
+    //     // 중요한것은 첨부파일이 있었는지? 없었는지?....
+    //     MultipartFile file = vo.getFile();
+    //     if(file.getSize() > 0) {
+    //         // 파일이 첨부된 상태일때만 업로드한다.
+
+    //         //업로드할 위치(절대경로)
+    //         String realPath = application.getRealPath(bbs_upload);
+
+    //         //원본 파일명
+    //         String oname = file.getOriginalFilename();
+
+    //         //같은 파일명이 있다면 파일명 변경
+    //         String fname = FileRenameUtil.checkSameFileName(oname, realPath);
+
+    //         try {
+    //             file.transferTo(new File(realPath, fname)); //서버에 업로드(저장)
+    //             vo.setFile_name(fname);
+    //             vo.setOri_name(oname);
+    //         } catch (Exception e) {
+    //             e.printStackTrace();
+    //         }
+    //     }
+    //     vo.setIp(request.getRemoteAddr()); //vo에 작성자 IP 담기
+    //     int result = bbsService.add(vo); //DB에 저장
+
+    //     // 목록으로 돌아간다.
+    //     mv.setViewName("redirect:/list?bname="+vo.getBname());
+    //     return mv;
+    // }
+
+    //게시글 보기기능
+    // 조회수 증가처리, 읽은 게시물은 조회수 증가를 하지 않는다.
+    // 조회수 증가처리는 세션을 활용하여 처리한다.
+    @GetMapping("/view")
+    public ModelAndView getBbs(@RequestParam String bname,
+        @RequestParam String b_idx, String cPage) { //bname, b_idx는 필수로 파라미터로 받아야함
+        ModelAndView mv = new ModelAndView();
+        
+        //세션에 read_list라는 이름으로 저장된 객체를 얻어내자!
+        Object obj = session.getAttribute("read_list");
+        ArrayList<BbsVO> list = null;
+
+        //obj가 null이 아니면 obj를 형변환 시켜서 list에 담자
+        if(obj != null) {
+            list = (ArrayList<BbsVO>)obj;
+        } else {
+            list = new ArrayList<BbsVO>();
+            session.setAttribute("read_list", list); //세션에 저장
+        }
+
+        //사용자가 선택한 게시물(b_idx)을 DB로부터 가져온다.
+        BbsVO vo = bbsService.getBbs(b_idx);
+
+        //vo를 list에서 찾아보자
+        boolean chk = false; // false가 계속 유지된다면 조회수 증가
+        for(BbsVO v : list) {
+            if(v.getB_idx().equals(b_idx)) {
+                chk = true; // 이미 읽은 게시물이다.
+                break;
+            }
+        }
+
+        //chk가 false를 유지하고 있다면 한번도 읽지 않은 게시물을 의미한다.
+        // 그러므로 조회수를 증가시키자
+        if(!chk){
+            bbsService.hit(b_idx); //조회수 증가!(DB에 반영)
+
+            // 화면에 즉각적으로 반영하기 위해서 먼저
+            // 조회수를 얻어낸다.
+            String hit = vo.getHit(); //vo에 String형으로 저장되어있음 그래서 정수형으로 변경 필요
+            int h = Integer.parseInt(hit)+1; //1증가
+
+            vo.setHit(String.valueOf(h)); //vo에 다시 저장
+            //이렇게 hit라는 변수를 연산처리 한다면
+            //처음부터 vo의 hit라는 변수는 int형으로 선언하는 것을 권장한다!
+
+            //읽은 게시물로 등록하자
+            list.add(vo);
+        }
+        mv.addObject("bname", bname);
+        mv.addObject("cPage", cPage);
+        mv.addObject("vo", vo);
+        mv.setViewName(bname+"/view");
+        return mv;
+    }
+    
     
 }

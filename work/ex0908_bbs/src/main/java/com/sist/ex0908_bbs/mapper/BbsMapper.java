@@ -16,4 +16,6 @@ public interface BbsMapper {
     int add(BbsVO vo);
 
     BbsVO getBbs(String b_idx);
+
+    int hit(String b_idx); //조회수 증가
 }
