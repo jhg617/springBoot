@@ -16,4 +16,10 @@ public interface EmpRepository extends JpaRepository<Emp, Long>{
     // 그러므로 값이 없을 때 보다 안전하게 처리된다.
     Optional<Emp> findByEmpno(Long empno);
     List<Emp> findByDeptno(String deptno); //부서번호검색
+    
+    List<Emp> findByJobAndDeptno(String job, String deptno); //job과 부서번호 검색
+    List<Emp> findByJobLikeAndDeptno(String job, String deptno); //Like로 job과 부서번호 검색
+
+    List<Emp> findByJobContainingAndDeptno(String job, String deptno); //Containing로 job과 부서번호 검색
+    List<Emp> findByEnameStartingWith(String ename); //StartingWith로 사원 이름 검색
 }

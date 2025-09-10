@@ -27,4 +27,22 @@ public class EmpService {
     public List<Emp> findByDeptno(String deptno) {
         return empRepository.findByDeptno(deptno);
     }
+
+    public List<Emp> findByJobAndDeptno(String job, String deptno) {
+        return empRepository.findByJobAndDeptno(job, deptno);
+    }
+
+    //Like 사용
+    /* public List<Emp> findByJobLikeAndDeptno(String job, String deptno) {
+        return empRepository.findByJobLikeAndDeptno(job, deptno);
+    } */
+
+    //Containing 사용
+    public List<Emp> findByJobContainingAndDeptno(String job, String deptno) {
+        return empRepository.findByJobContainingAndDeptno(job, deptno);
+    }
+
+    public List<Emp> findByEnameStartingWith(String ename){
+        return empRepository.findByEnameStartingWith(ename);
+    }
 }
