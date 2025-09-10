@@ -1,5 +1,6 @@
 package com.sist.ex0910_jpa2.service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,9 +34,9 @@ public class EmpService {
     }
 
     //Like 사용
-    /* public List<Emp> findByJobLikeAndDeptno(String job, String deptno) {
+    public List<Emp> findByJobLikeAndDeptno(String job, String deptno) {
         return empRepository.findByJobLikeAndDeptno(job, deptno);
-    } */
+    }
 
     //Containing 사용
     public List<Emp> findByJobContainingAndDeptno(String job, String deptno) {
@@ -44,5 +45,9 @@ public class EmpService {
 
     public List<Emp> findByEnameStartingWith(String ename){
         return empRepository.findByEnameStartingWith(ename);
+    }
+
+    public List<Emp> findBySalLessThanEqualOrderByHiredateDesc(BigDecimal sal){
+        return empRepository.findBySalLessThanEqualOrderByHiredateDesc(sal);
     }
 }

@@ -1,5 +1,7 @@
 package com.sist.ex0910_jpa2.controller;
 
+import java.math.BigDecimal;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -54,9 +56,27 @@ public class EmpController {
         //return empService.findByJobContainingAndDeptno(job, deptno);
     } */
 
+    @GetMapping("/job_dept")
+    public Object jobDept(
+        @RequestParam String job, @RequestParam String deptno) {
+        return empService.findByJobContainingAndDeptno(job, deptno);
+    }
+
+    @GetMapping("/job_dept2")
+    public Object jobDept2(@RequestParam String job, @RequestParam String deptno) {
+        return empService.findByJobLikeAndDeptno(job, deptno);
+    }
+
+
     @RequestMapping("/getEname")
     public Object findByEnameStartingWith(@RequestParam String ename) {
         return empService.findByEnameStartingWith(ename);
     }
+
+    @GetMapping("/getSal")
+    public Object findBySalLessThanEqualOrderByHiredateDesc(@RequestParam BigDecimal sal) {
+        return empService.findBySalLessThanEqualOrderByHiredateDesc(sal);
+    }
+    
 
 }
