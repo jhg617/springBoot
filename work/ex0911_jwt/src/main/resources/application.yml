@@ -1,0 +1,4 @@
+spring:
+    profiles:
+        active: dev     # 활성화는 application-dev.yml파일로 함
+        include: secret     # 이 문서안에 application-secret.yml 파일의 내용을 포함함
