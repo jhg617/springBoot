@@ -24,6 +24,7 @@ public class MemberController {
     @RequestMapping
     public ModelAndView index() { //RestController이기 때문에 ModelAndView로 던져야함
         ModelAndView mv = new ModelAndView();
+        mv.setViewName("index");
         return mv;
     }
     
