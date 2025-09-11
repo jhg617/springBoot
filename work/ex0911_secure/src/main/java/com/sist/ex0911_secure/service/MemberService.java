@@ -39,7 +39,7 @@ public class MemberService {
             // 이때 비밀번호가 일치하는지는
             // passwordEncode에게 물어봐야 한다.
             if(passwordEncoder.matches(
-                vo.getM_pw(), mvo.getM_pw())); //vo가 가진 패스워드, db가 가진 패스워드
+                vo.getM_pw(), mvo.getM_pw())) //vo가 가진 패스워드, db가 가진 패스워드
                 return mvo;
         }
         return null; //패스워드나 id가 다르면 null을 반환

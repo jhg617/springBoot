@@ -12,7 +12,8 @@
   </select>
 
   <!-- 회원가입기능 -->
-  <insert id="reg" parameterType="com.sist.ex0911_secure.vo.MemVO">
+  <insert id="reg" parameterType="com.sist.ex0911_secure.vo.MemVO"
+  useGeneratedKeys="true" keyProperty="m_idx">
     INSERT INTO member_t(m_id, m_pw, m_name)
     VALUES(#{m_id}, #{m_pw}, #{m_name})
   </insert>
