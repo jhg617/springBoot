@@ -78,4 +78,12 @@ public class JwtProvider {
 
         return value;
     }
+
+    //토큰에 담긴 사용자정보(claims)를 반환한다.
+    public Map<String, Object> getClaims(String token){
+        return Jwts.parser().verifyWith(getSecretKey())
+                        .build()
+                        .parseSignedClaims(token)
+                        .getPayload(); // 페이로드안에 있는 사용자정보(claims)을 반환한다.
+    }
 }
