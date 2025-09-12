@@ -55,7 +55,7 @@ class Ex0911JwtApplicationTests {
 		claims.put("upwd","1111");
 		claims.put("uemail","admin@korea.com");
 
-		String accessToken = jwtProvider.getToken(claims, 60*60*3); //3시간뒤 만료예정
+		String accessToken = jwtProvider.genToken(claims, 60*60*3); //3시간뒤 만료예정
 		System.out.println("ACCESS-TOKEN:"+accessToken);
 
 		assertThat(accessToken).isNotNull();
@@ -79,7 +79,7 @@ class Ex0911JwtApplicationTests {
 		claims.put("mphone", "01012465783");
 
 		//토큰생성
-		String token = jwtProvider.getToken(claims, 60*60); // 3600ms
+		String token = jwtProvider.genToken(claims, 60*60); // 3600ms
 
 		//토큰생성 : -1을 넣어 바로 만료되는 토큰을 받는다.
 		//String token = jwtProvider.getToken(claims, -1); // 3600ms
@@ -97,7 +97,7 @@ class Ex0911JwtApplicationTests {
 		claims.put("mname", "이도");
 		claims.put("mphone", "01012465783");
 
-		String token = jwtProvider.getToken(claims, 60*60); // 3600ms
+		String token = jwtProvider.genToken(claims, 60*60); // 3600ms
 		System.out.println("Token: "+token);
 
 		//유효한 토큰인지? 검증을 받는다.

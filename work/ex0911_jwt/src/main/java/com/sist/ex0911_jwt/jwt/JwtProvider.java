@@ -36,7 +36,7 @@ public class JwtProvider {
         return secretKey; //key를 얻어서 주고, 없다면 새로 만들어서 준다.
     }
 
-    public String getToken(Map<String, Object> map, int seconds){
+    public String genToken(Map<String, Object> map, int seconds){
         long now = new Date().getTime(); //현재시간 객체 생성
 
         Date accessTokenExpiresIn = new Date(now+1000L*seconds); //토큰 만료시간 지정
