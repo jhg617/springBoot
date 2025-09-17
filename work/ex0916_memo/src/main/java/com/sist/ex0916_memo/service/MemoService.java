@@ -18,4 +18,8 @@ public class MemoService {
         return mapper.all();
     }
 
+    public MemoVO getMemo(String idx){
+        return mapper.getMemo(idx);
+    }
+
 }

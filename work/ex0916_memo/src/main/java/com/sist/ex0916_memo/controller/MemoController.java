@@ -32,4 +32,16 @@ public class MemoController {
 
         return map;
     }
+
+    @RequestMapping("/getMemo")
+    public Map<String, Object> getMemo(String idx) {
+        System.out.println(idx);
+        Map<String, Object> map = new HashMap<>();
+        MemoVO vo = mService.getMemo(idx);
+
+        // 준비된 map에 list에 저장하자!
+        map.put("vo", vo);
+
+        return map;
+    }
 }

@@ -6,4 +6,10 @@
   <select id="all" resultType="com.sist.ex0916_memo.vo.MemoVO">
     select * from memo_t
   </select>
+
+  <select id="getMemo" parameterType="String"
+  resultType="com.sist.ex0916_memo.vo.MemoVO">
+    select * from memo_t
+    where idx = #{idx}
+  </select>
 </mapper>

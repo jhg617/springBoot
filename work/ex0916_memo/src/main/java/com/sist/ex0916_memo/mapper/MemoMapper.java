@@ -9,4 +9,5 @@ import com.sist.ex0916_memo.vo.MemoVO;
 @Mapper
 public interface MemoMapper {
     List<MemoVO> all();
+    MemoVO getMemo(String idx);
 }
