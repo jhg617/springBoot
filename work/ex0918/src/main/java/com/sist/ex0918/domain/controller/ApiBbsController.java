@@ -17,6 +17,9 @@ import org.springframework.security.access.method.P;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
 
 
 @RestController
@@ -29,7 +32,7 @@ public class ApiBbsController {
     @GetMapping("")
     public ResultData<List<Bbs>> getList() {
         //Map<String, Object> map = new HashMap<>();
-        List<Bbs> list = bbsService.getList();
+        List<Bbs> list = this.bbsService.getList();
         //map.put("ar", list);
         //map.put("length", list.size());
         String msg = "fail";
@@ -60,6 +63,25 @@ public class ApiBbsController {
         }
         //return map;
         return ResultData.of(cnt, msg, bbs);
+    }
+    
+    @PostMapping("/write")
+    public ResultData<Bbs> write(@RequestBody Bbs bbs) {
+        Bbs bvo = bbsService.create(
+            bbs.getTitle(), bbs.getWriter(), bbs.getContent());
+
+            // 저장된 결과가 bvo이고 그 안에 b_idx라는 기본키값도 가지고 있다.
+            // b_idx값을 다른 테이블에 저장도 가능하다.
+
+        String msg = "fail";
+        int cnt = 0;
+        if(bvo != null){
+            msg = "success";
+            cnt = 1;
+        }
+        //return map;
+        return ResultData.of(cnt, msg, bvo);
+        
     }
     
 }
