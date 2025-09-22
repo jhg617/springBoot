@@ -88,4 +88,12 @@ public class JwtProvider {
                         .parseSignedClaims(token)
                         .getPayload(); // 페이로드안에 있는 사용자정보(claims)을 반환한다.
     }
+
+    public String getAccessToken(Map<String, Object> map){
+        return genToken(map, 60*5);
+    }
+
+    public String getRefreshToken(Map<String, Object> map){
+        return genToken(map, 60*60*24*100);
+    }
 }
