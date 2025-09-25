@@ -32,6 +32,10 @@ public class RequestService {
     public String getCookie(String name){
         Cookie[] cookies = request.getCookies();
 
+        if (cookies == null) {
+            return "";
+        }
+
         return Arrays.stream(cookies) //cookies배열에서 스트림생성
             .filter(cookie -> cookie.getName().equals(name))//name과 같은 이름을 가진 쿠키만 필터링한다.
             .findFirst() //필터링된 결과가 여러 개가 있을 수 있는데 첫번째것만

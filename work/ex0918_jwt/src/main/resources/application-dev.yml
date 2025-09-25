@@ -7,7 +7,7 @@ spring:
             enabled: always
     datasource:
         driver-class-name: com.mysql.cj.jdbc.Driver
-        url: jdbc:mysql://localhost:3306/my_db
+        url: jdbc:mysql://3.39.177.130:3306/my_db
         username: root
         password: 1111
 custom:

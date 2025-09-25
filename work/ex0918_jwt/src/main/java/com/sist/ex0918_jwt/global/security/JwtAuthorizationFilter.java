@@ -46,7 +46,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter{
             // 얻어내어 검증한 후 accessToken 받아낸다.
             if(!memberService.validateToken(accessToken)){
                 //accessToken이 만료된 경우
-                String refreshToken = requestService.getCookie("refeshToken");
+                String refreshToken = requestService.getCookie("refreshToken");
 
                 ResultData<String> resultData = 
                     memberService.refreshAccessToken(refreshToken); //refresh토큰을 얻어낸다.
