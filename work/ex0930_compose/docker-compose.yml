@@ -1,0 +1,33 @@
+services:
+  my_sql:
+    image: mysql:8.0
+    environment:
+      - MYSQL_USER=admin
+      - MYSQL_PASSWORD=1111
+    networks:
+      - my-net1
+    volumes:
+      - ./db/conf.d:/etc/mysql/conf.d
+      - ./db/data:/var/lib/mysql
+    env_file:
+      - .env
+    ports:
+      - "3307:3306"
+    restart: always
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: backend
+    networks:
+      - my-net1
+    ports:
+      - "8080:8080"
+    depends_on:
+      - my_sql
+    restart: always
+
+networks:
+  my-net1:
+    driver: bridge
