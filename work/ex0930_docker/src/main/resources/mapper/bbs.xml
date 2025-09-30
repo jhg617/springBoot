@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sist.ex0930_docker.mapper.BbsMapper">
+
+  <resultMap id="map1" type="com.sist.ex0930_docker.vo.BbsVO">
+    <id property="b_idx" column="b_idx"/>
+    <collection property="c_list"
+        ofType="com.sist.ex0930_docker.vo.CommVO"
+        select="com.sist.ex0930_docker.mapper.CommMapper.commList"
+        column="b_idx"/>
+  </resultMap>
+
+  <!-- 총 게시물의 수를 반환하는 기능 -->
+  <select id="totalCount" resultType="int" parameterType="Map">
+    SELECT COUNT(*) FROM bbs_t
+    WHERE status = 0 AND bname = #{bname}
+    <if test="searchType != null and searchValue != null">
+        <choose>
+            <when test="searchType == 0">
+                AND subject LIKE CONCAT('%', #{searchValue}, '%')
+            </when>
+            <when test="searchType == 1">
+                AND writer LIKE CONCAT('%', #{searchValue}, '%')
+            </when>
+            <when test="searchType == 2">
+                AND content LIKE CONCAT('%', #{searchValue}, '%')
+            </when>
+            <when test="searchType == 3">
+                AND write_date LIKE CONCAT('%', #{searchValue}, '%')
+            </when>
+        </choose>
+    </if>
+  </select>
+  <!-- 원글들을 원하는 만큼 가져오는 기능 -->
+  <select id="list" resultMap="map1" parameterType="Map">
+    SELECT * FROM(
+        SELECT @RN:=@RN+1 as rnum, a.* FROM(
+            SELECT * FROM bbs_t
+            <where>
+                status = 0 AND bname = #{bname}
+                <if test="searchType != null and searchValue != null">
+                    <choose>
+                        <when test="searchType == 0">
+                            AND subject LIKE CONCAT('%', #{searchValue}, '%')
+                        </when>
+                        <when test="searchType == 1">
+                            AND writer LIKE CONCAT('%', #{searchValue}, '%')
+                        </when>
+                        <when test="searchType == 2">
+                            AND content LIKE CONCAT('%', #{searchValue}, '%')
+                        </when>
+                        <when test="searchType == 3">
+                            AND write_date LIKE CONCAT('%', #{searchValue}, '%')
+                        </when>
+                    </choose>
+                </if>
+            </where>
+            ORDER BY b_idx DESC
+        ) a, (SELECT @RN:=0) b
+    ) c WHERE c.rnum BETWEEN #{begin} AND #{end}
+  </select>
+
+  <!-- 원글 저장 -->
+  <insert id="add" parameterType="com.sist.ex0930_docker.vo.BbsVO">
+    INSERT INTO bbs_t(subject, writer, content, file_name, ori_name, pwd,
+        write_date, ip, hit, bname, status)
+    VALUES(#{subject}, #{writer}, #{content}, #{file_name}, #{ori_name}, #{pwd},
+        NOW(), #{ip}, 0, #{bname}, 0)
+  </insert>
+
+  <!-- b_idx를 인자로 받아서 원글 검색 -->
+  <select id="get_bbs" parameterType="String" resultMap="map1">
+    SELECT * FROM bbs_t
+    WHERE b_idx = #{no}
+  </select>
+  
+  <!-- 조회수 증가 -->
+  <update id="hit" parameterType="String">
+    UPDATE bbs_t
+    SET hit = hit + 1
+    WHERE b_idx = #{no}
+  </update>
+
+  <!-- 원글 수정 -->
+  <update id="edit" parameterType="Map">
+    UPDATE bbs_t
+    <trim prefix="SET" suffixOverrides=",">
+        subject = #{subject},
+        content = #{content},
+        <if test="fname != null">
+            file_name = #{fname},
+            ori_name = #{oname}
+        </if>
+    </trim>
+    SET hit = hit + 1
+    WHERE b_idx = #{no}
+  </update>
+
+  <!-- 원글 삭제 -->
+  <update id="del" parameterType="String">
+    UPDATE bbs_t
+    SET status = 1
+    WHERE b_idx = #{no}
+  </update>
+</mapper>
